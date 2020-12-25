@@ -1,0 +1,9 @@
+                            -------------
+                            Y Interpreter
+                            -------------
+
+This is an interpreter for the Y programming language. For details
+consult the Y manual (./YManual.org)
+
+This software is released under the GNU GPL version 3, see COPYING for
+details.

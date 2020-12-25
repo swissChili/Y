@@ -1,0 +1,137 @@
+#+title: The Y Programming Language
+#+latex_compiler: xelatex
+#+latex_header: \usepackage{libertine}
+#+latex_header: \usepackage{unicode-math}
+
+* Purpose
+
+  Y is designed as a language for code golf and competitive
+  programming. Unlike many other golf languages however, it also aims
+  to be easily understandable to someone understanding only the basics
+  of its syntax.
+
+  Y is not a stack-based language like many other golf languages
+  are. Instead it operates on a paradigm similar to many conventional
+  languages. Values are passed as arguments to functions and stored in
+  variables.
+
+* Syntax
+
+  Named values in Y consist of either *variables*, *monads* or
+  *dyads*. A variable is self explanatory: it holds one value. A monad
+  is a function that takes one argument. For example: =!= is a monad
+  which returns the boolean inverse of its argument. =+= is a dyad, it
+  takes two arguments, for example: =2 + 4= evaluates to 6.
+
+  Built-in arithmetic functions are by default *right associative*,
+  whereas other functions are by default *left associative*. By
+  convention, functions which take some data and some information on
+  how to process the data should take the data as their first
+  argument, so that they can be used without grouping.
+
+  #+begin_src y
+    « a and b here are user defined functions, and therefore left
+    associative. These two examples are equivelant: »
+    123 a X b Y
+    (123 a X) b Y
+  #+end_src
+
+  Data-first and left associative dyads can conveniently be “chained”
+  in series like so:
+
+  #+begin_src y
+  a X b Y c Z d
+  #+end_src
+
+  This might be equivalent to the following in a C-style language:
+  =Z(Y(X(a, b), c), d)=.
+
+** Precedence
+
+   All functions in Y have their own [[https://en.wikipedia.org/wiki/Order_of_operations][precedence]] that dictates how they
+   are parsed.
+
+   Functions follow largely the same precedence as they do in
+   math. User defined functions by default have precedence 5. Consult
+   the reference at the end of this manual for precedence information.
+
+** Definitions
+
+   The built-in functions ===, =←= and =↔= are used to define
+   names. The first is used to define variables, the second to define
+   monads, and the final to define dyads. For example:
+
+   #+begin_src y
+     « identity monad, monad argument is always named x »
+     id ← \{x} ;
+     « return the greater of two arguments, dyad arguments are x and y »
+     max ↔ \{ x < y && y || x };
+   #+end_src
+
+   The =\{}= syntax seen in this example is very common in Y. The
+   backslash (=\=) is Y’s quote operator, equivalent to =’= in
+   Lisp. Curly braces are used to define an array. When an array is
+   quoted in Y --- just as in Lisp ---, its contents is not evaluated
+   but preserved as-is, perhaps to be evaluated later.
+
+   Unlike Lisp however, quoted arrays in Y are not used to define
+   lists of plain data, as the parser will still compile the contents
+   of the array into an intermediate representation consumable by the
+   interpreter. Arrays of values are written without the preceding
+   quote, just as a series of expressions in curly braces.
+
+** Arrays
+
+   Arrays in Y are defined as a series of expressions surrounded in
+   curly braces (={= and =}=). If the termination of each expression
+   is not ambiguous then semicolons are not necessary to separate
+   them. For example:
+
+   #+begin_src y
+   evens = {2 4 6 8 10};
+   « Same as »
+   evens = {2; 2-2; 12/2; 4*4; 10};
+   #+end_src
+
+   The =At= dyad can be used to index an array. Array indices are
+   1-based, that is: the first element is at index 1, the second at 2,
+   etc.
+
+* Reference
+
+** Core functions
+
+   | Name | Description            | Type  | Precedence |
+   |------+------------------------+-------+------------|
+   | ←    | Define monad           | DYADR |          0 |
+   | ↔    | Define dyad            | DYADR |          0 |
+   | =    | Define/assign variable | DYADR |          0 |
+  
+** Logical and arithmetic functions
+ 
+   | Name   | Description  | Type  | Precedence |
+   |--------+--------------+-------+------------|
+   | \==    | Equal        | DYADL |          2 |
+   | !=     | Not equal    | DYADL |          2 |
+   | <      | Less than    | DYADL |          2 |
+   | >      | Greater than | DYADL |          2 |
+   | &      | And          | DYADL |          2 |
+   | \vert  | Or           | DYADL |          2 |
+   | +      | Plus         | DYADR |          3 |
+   | -      | Minus        | DYADR |          3 |
+   | %      | Remainder    | DYADL |          3 |
+   | * or × | Multiply     | DYADR |          4 |
+   | / or ÷ | Divide       | DYADR |          4 |
+   | #      | Length       | DYADL |          5 |
+   | ∋      | Member       | DYADL |          5 |
+   | ∌      | Not member   | DYADL |          5 |
+   | Set    | Set          | MONAD |        N/A |
+   | ∪      | Union        | DYADL |          5 |
+   | ∩      | Intersection | DYADL |          5 |
+   | At     | Item At      | DYADL |          5 |
+
+** Function composition
+
+   | Name | Description | Type  | Precedence |
+   |------+-------------+-------+------------|
+   | ⋱    | Reduce      | DYADL |          5 |
